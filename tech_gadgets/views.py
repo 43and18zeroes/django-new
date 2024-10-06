@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.utils.text import slugify
+from django.urls import reverse
 
 from .dummy_data import gadgets
 
@@ -11,7 +12,9 @@ def start_page_view(request):
     return HttpResponse("Hey, das hat doch gut funktioniert!")
 
 def single_gadget_view(request, gadget_id):
-    return JsonResponse({"result": slugify(gadgets[1]['name'])})
+    new_slug = slugify(gadgets[gadget_id]["name"])
+    new_url = reverse("gadget_slug_url", args=[new_slug])
+    return redirect(new_url)
 
 def single_gadget_slug_view(request, gadget_slug):
     gadget_match = {"result": "nothing"}
