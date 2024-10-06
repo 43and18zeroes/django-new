@@ -11,4 +11,4 @@ def start_page_view(request):
 
 def single_gadget_view(request, gadget_id):
     # return HttpResponse(json.dumps(gadget_id))
-    return JsonResponse({"test": True})
+    return JsonResponse({"result": gadget_id})
