@@ -12,3 +12,12 @@ def start_page_view(request):
 
 def single_gadget_view(request, gadget_id):
     return JsonResponse({"result": slugify(gadgets[1]['name'])})
+
+def single_gadget_slug_view(request, gadget_slug):
+    gadget_match = {"result": "nothing"}
+    
+    for gadget in gadgets:
+        if slugify(gadget["name"]) == gadget_slug:
+            gadget_match = gadget
+            
+    return JsonResponse(gadget_match)
