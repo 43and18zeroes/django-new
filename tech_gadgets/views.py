@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.http import JsonResponse, HttpResponseNotFound, Http404
@@ -27,5 +29,13 @@ def single_gadget_slug_view(request, gadget_slug):
             
     if gadget_match:
         return JsonResponse(gadget_match)
-    
-    raise Http404
+    raise Http404()
+
+def single_gadget_post_view(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            print(f"recieved data: {data}")
+            return JsonResponse({"response": "Success"})
+        except:
+            return JsonResponse({"response": "Failure"})
