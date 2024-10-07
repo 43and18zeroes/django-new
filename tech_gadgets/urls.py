@@ -5,5 +5,5 @@ urlpatterns = [
     path('', start_page_view),
     path('gadget/<int:gadget_id>', single_gadget_view),
     path('gadget/<str:gadget_slug>', single_gadget_slug_view, name="gadget_slug_url"),
-    path('gadget/send_gadget', single_gadget_post_view),
+    path('gadget/send_gadget/', single_gadget_post_view),
 ]
