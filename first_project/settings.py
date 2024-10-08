@@ -52,13 +52,13 @@ MIDDLEWARE = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-  'http://127.0.0.1:5500',
-  'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
 ]
 
 CORS_ALLOWED_ORIGINS = [
-  'http://127.0.0.1:5500',
-  'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
 ]
 
 ROOT_URLCONF = 'first_project.urls'
@@ -66,8 +66,11 @@ ROOT_URLCONF = 'first_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'first_project/templates/',
-                 BASE_DIR / 'tech_gadgets/templates/'],
+        'DIRS': [
+            BASE_DIR / 'first_project/templates/',
+            BASE_DIR / 'tech_gadgets/templates/',
+            BASE_DIR / 'tech_gadgets/static/'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
