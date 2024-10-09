@@ -65,9 +65,9 @@ class GadgetView(View):
         try:
             data = json.loads(request.body)
             print(f"recieved data: {data["test"]}")
-            return JsonResponse({"response": "Success"})
+            return JsonResponse({"response": "Success GadgetView(View)"})
         except:
-            return JsonResponse({"response": "Failure"})
+            return JsonResponse({"response": "Failure GadgetView(View)"})
         
 class ManufacturerView(View):
     def get(self, request, manufacturer_slug):
@@ -85,9 +85,9 @@ class ManufacturerView(View):
         try:
             data = json.loads(request.body)
             print(f"recieved data: {data["test"]}")
-            return JsonResponse({"response": "Success"})
+            return JsonResponse({"response": "Success ManufacturerView(View)"})
         except:
-            return JsonResponse({"response": "Failure"})
+            return JsonResponse({"response": "Failure ManufacturerView(View)"})
 
 def single_gadget_view(request, gadget_slug=""):
     
@@ -105,15 +105,35 @@ def single_gadget_view(request, gadget_slug=""):
         try:
             data = json.loads(request.body)
             print(f"recieved data: {data["test"]}")
-            return JsonResponse({"response": "Success"})
+            return JsonResponse({"response": "Success single_gadget_view(request, gadget_slug="")"})
         except:
-            return JsonResponse({"response": "Failure"})
+            return JsonResponse({"response": "Failure single_gadget_view(request, gadget_slug="")"})
 
 def single_gadget_post_view(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
             print(f"recieved data: {data["test"]}")
-            return JsonResponse({"response": "Success"})
+            return JsonResponse({"response": "Success single_gadget_post_view(request)"})
         except:
-            return JsonResponse({"response": "Failure"})
+            return JsonResponse({"response": "Failure single_gadget_post_view(request)"})
+        
+def add_new_man(request):
+    print(request)
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            name = data.get('name')
+            headquarters = data.get('headquarters')
+            founded = data.get('founded')
+            website = data.get('website')
+            description = data.get('description')
+
+            # Hier würdest du die Daten verarbeiten oder in der Datenbank speichern
+            # Beispiel: Manufacturer.objects.create(...)
+
+            return JsonResponse({"message": "Manufacturer erfolgreich erstellt"}, status=201)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
