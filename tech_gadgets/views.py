@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from django.views import View
 
-from .dummy_data import gadgets
+from .dummy_data import gadgets, manufacturers
 
 from django.views.generic.base import RedirectView
 
@@ -33,6 +33,22 @@ def single_gadget_int_view(request, gadget_id):
         return redirect(new_url)
     return HttpResponseNotFound("not found by me")
 
+class RedirectToManufacturerView(RedirectView):
+    pattern_name = "manufacturer_slug_url"
+    
+    def get_redirect_url(self, *args, **kwargs):
+        slug = slugify(manufacturers[kwargs.get("manufacturer_id", 0)]["name"])
+        new_kwargs = {"manufacturer_slug": slug}
+        print(type(new_kwargs))
+        return super().get_redirect_url(*args, **new_kwargs)
+
+def single_manufacturer_int_view(request, manufacturer_id):
+    if len(manufacturers) > manufacturer_id:
+        new_slug = slugify(manufacturers[manufacturer_id]["name"])
+        new_url = reverse("manufacturer_slug_url", args=[new_slug])
+        return redirect(new_url)
+    return HttpResponseNotFound("not found by me")
+
 class GadgetView(View):
     def get(self, request, gadget_slug):
         gadget_match = None
@@ -42,6 +58,25 @@ class GadgetView(View):
                 
         if gadget_match:
             return JsonResponse(gadget_match)
+        raise Http404()
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            print(f"recieved data: {data["test"]}")
+            return JsonResponse({"response": "Success"})
+        except:
+            return JsonResponse({"response": "Failure"})
+        
+class ManufacturerView(View):
+    def get(self, request, manufacturer_slug):
+        manufacturer_match = None
+        for manufacturer in manufacturers:
+            if slugify(manufacturer["name"]) == manufacturer_slug:
+                manufacturer_match = manufacturer
+                
+        if manufacturer_match:
+            return JsonResponse(manufacturer_match)
         raise Http404()
     
     def post(self, request, *args, **kwargs):
