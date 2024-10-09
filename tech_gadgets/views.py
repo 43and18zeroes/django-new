@@ -1,4 +1,5 @@
 import json
+import os
 
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
@@ -90,23 +91,37 @@ class ManufacturerView(View):
         #     return JsonResponse({"response": "Failure ManufacturerView(View)"})
         
         print(request)
+        DUMMY_DATA_PATH = os.path.join(os.path.dirname(__file__), 'dummy_data.py')
         if request.method == "POST":
             try:
+                # Lade die neuen Herstellerdaten aus der Anfrage
                 data = json.loads(request.body)
-                name = data.get('name')
-                headquarters = data.get('headquarters')
-                founded = data.get('founded')
-                website = data.get('website')
-                description = data.get('description')
+                new_manufacturer = {
+                    "name": data.get("name"),
+                    "headquarters": data.get("headquarters"),
+                    "founded": data.get("founded"),
+                    "website": data.get("website"),
+                    "description": data.get("description")
+                }
 
-                # Hier würdest du die Daten verarbeiten oder in der Datenbank speichern
-                # Beispiel: Manufacturer.objects.create(...)
+                # Importiere die manufacturers Liste aus der dummy_data.py Datei
+                from .dummy_data import manufacturers
 
-                return JsonResponse({"message": "Manufacturer erfolgreich erstellt"}, status=201)
+                # Füge den neuen Hersteller der Liste hinzu
+                manufacturers.append(new_manufacturer)
+
+                # Überschreibe den Inhalt der Datei dummy_data.py
+                with open(DUMMY_DATA_PATH, 'w') as file:
+                    # Erzeuge den neuen Dateiinhalt als String
+                    file_content = f"manufacturers = {json.dumps(manufacturers, indent=4)}"
+                    
+                    # Schreibe den neuen Inhalt in die Datei
+                    file.write(file_content)
+
+                return JsonResponse({"message": "Manufacturer erfolgreich hinzugefügt"}, status=201)
+
             except Exception as e:
                 return JsonResponse({"error": str(e)}, status=400)
-
-        return JsonResponse({"error": "Invalid request method"}, status=405)
 
 def single_gadget_view(request, gadget_slug=""):
     
