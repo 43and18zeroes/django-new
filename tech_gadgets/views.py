@@ -82,12 +82,31 @@ class ManufacturerView(View):
         raise Http404()
     
     def post(self, request, *args, **kwargs):
-        try:
-            data = json.loads(request.body)
-            print(f"recieved data: {data["test"]}")
-            return JsonResponse({"response": "Success ManufacturerView(View)"})
-        except:
-            return JsonResponse({"response": "Failure ManufacturerView(View)"})
+        # try:
+        #     data = json.loads(request.body)
+        #     print(f"recieved data: {data["test"]}")
+        #     return JsonResponse({"response": "Success ManufacturerView(View)"})
+        # except:
+        #     return JsonResponse({"response": "Failure ManufacturerView(View)"})
+        
+        print(request)
+        if request.method == "POST":
+            try:
+                data = json.loads(request.body)
+                name = data.get('name')
+                headquarters = data.get('headquarters')
+                founded = data.get('founded')
+                website = data.get('website')
+                description = data.get('description')
+
+                # Hier würdest du die Daten verarbeiten oder in der Datenbank speichern
+                # Beispiel: Manufacturer.objects.create(...)
+
+                return JsonResponse({"message": "Manufacturer erfolgreich erstellt"}, status=201)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=400)
+
+        return JsonResponse({"error": "Invalid request method"}, status=405)
 
 def single_gadget_view(request, gadget_slug=""):
     
