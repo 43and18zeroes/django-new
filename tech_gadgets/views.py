@@ -43,6 +43,7 @@ class RedirectToManufacturerView(RedirectView):
         return super().get_redirect_url(*args, **new_kwargs)
 
 def single_manufacturer_int_view(request, manufacturer_id):
+    print("manufacturer_id", manufacturer_id)
     if len(manufacturers) > manufacturer_id:
         new_slug = slugify(manufacturers[manufacturer_id]["name"])
         new_url = reverse("manufacturer_slug_url", args=[new_slug])
@@ -70,6 +71,7 @@ class GadgetView(View):
         
 class ManufacturerView(View):
     def get(self, request, manufacturer_slug):
+        print("get", manufacturer_slug)
         manufacturer_match = None
         for manufacturer in manufacturers:
             if slugify(manufacturer["name"]) == manufacturer_slug:
