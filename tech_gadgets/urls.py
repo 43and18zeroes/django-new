@@ -13,5 +13,5 @@ urlpatterns = [
     path('manufacturer/add_new_man', add_new_man, name='add_new_manufacturer'),
     path('manufacturer/<int:manufacturer_id>', single_manufacturer_int_view),
     path('manufacturer/<slug:manufacturer_slug>', ManufacturerView.as_view(), name="manufacturer_slug_url"),
-    path('manufacturer/<path:any_path>', ManufacturerView.as_view(), name="manufacturer_slug_url")
+    path('manufacturer/add_new_man/', ManufacturerView.as_view(), name="manufacturer_slug_url")
 ]
