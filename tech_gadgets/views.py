@@ -87,7 +87,6 @@ class ManufacturerView(View):
     
         if request.method == "POST":
             try:
-                # Lade die neuen Herstellerdaten aus der Anfrage
                 data = json.loads(request.body)
                 new_manufacturer = {
                     "name": data.get("name"),
@@ -97,14 +96,10 @@ class ManufacturerView(View):
                     "description": data.get("description")
                 }
 
-                # Füge den neuen Hersteller der Liste hinzu
                 manufacturers.append(new_manufacturer)
-
-                # Datei lesen
                 with open(DUMMY_DATA_PATH, 'r') as file:
                     lines = file.readlines()
-
-                # Die manufacturers-Liste in dummy_data.py suchen und ersetzen
+                    
                 start_index = None
                 end_index = None
 
@@ -116,11 +111,8 @@ class ManufacturerView(View):
                         break
 
                 if start_index is not None and end_index is not None:
-                    # JSON aktualisieren
                     updated_data = f"manufacturers = {json.dumps(manufacturers, indent=4)}\n"
                     lines = lines[:start_index] + [updated_data] + lines[end_index + 1:]
-
-                    # Datei überschreiben
                     with open(DUMMY_DATA_PATH, 'w') as file:
                         file.writelines(lines)
 
