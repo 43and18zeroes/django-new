@@ -83,16 +83,8 @@ class ManufacturerView(View):
         raise Http404()
     
     def post(self, request, *args, **kwargs):
-        # try:
-        #     data = json.loads(request.body)
-        #     print(f"recieved data: {data["test"]}")
-        #     return JsonResponse({"response": "Success ManufacturerView(View)"})
-        # except:
-        #     return JsonResponse({"response": "Failure ManufacturerView(View)"})
-        
-        print("post", request)
-        print(request)
         DUMMY_DATA_PATH = os.path.join(os.path.dirname(__file__), 'dummy_data.py')
+    
         if request.method == "POST":
             try:
                 # Lade die neuen Herstellerdaten aus der Anfrage
@@ -105,21 +97,34 @@ class ManufacturerView(View):
                     "description": data.get("description")
                 }
 
-                # Importiere die manufacturers Liste aus der dummy_data.py Datei
-                from .dummy_data import manufacturers
-
                 # Füge den neuen Hersteller der Liste hinzu
                 manufacturers.append(new_manufacturer)
 
-                # Überschreibe den Inhalt der Datei dummy_data.py
-                with open(DUMMY_DATA_PATH, 'w') as file:
-                    # Erzeuge den neuen Dateiinhalt als String
-                    file_content = f"manufacturers = {json.dumps(manufacturers, indent=4)}"
-                    
-                    # Schreibe den neuen Inhalt in die Datei
-                    file.write(file_content)
+                # Datei lesen
+                with open(DUMMY_DATA_PATH, 'r') as file:
+                    lines = file.readlines()
 
-                return JsonResponse({"message": "Manufacturer erfolgreich hinzugefügt"}, status=201)
+                # Die manufacturers-Liste in dummy_data.py suchen und ersetzen
+                start_index = None
+                end_index = None
+
+                for i, line in enumerate(lines):
+                    if line.strip().startswith('manufacturers ='):
+                        start_index = i
+                    elif start_index is not None and line.strip().startswith(']'):
+                        end_index = i
+                        break
+
+                if start_index is not None and end_index is not None:
+                    # JSON aktualisieren
+                    updated_data = f"manufacturers = {json.dumps(manufacturers, indent=4)}\n"
+                    lines = lines[:start_index] + [updated_data] + lines[end_index + 1:]
+
+                    # Datei überschreiben
+                    with open(DUMMY_DATA_PATH, 'w') as file:
+                        file.writelines(lines)
+
+                return JsonResponse({"status": "success", "message": "Manufacturer added"})
 
             except Exception as e:
                 return JsonResponse({"error": str(e)}, status=400)
