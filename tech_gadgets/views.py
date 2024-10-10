@@ -90,6 +90,7 @@ class ManufacturerView(View):
         # except:
         #     return JsonResponse({"response": "Failure ManufacturerView(View)"})
         
+        print("post", request)
         print(request)
         DUMMY_DATA_PATH = os.path.join(os.path.dirname(__file__), 'dummy_data.py')
         if request.method == "POST":
