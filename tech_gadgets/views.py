@@ -71,55 +71,77 @@ class GadgetView(View):
             return JsonResponse({"response": "Failure GadgetView(View)"})
         
 class ManufacturerView(View):
-    def get(self, request, manufacturer_slug):
-        print("get", manufacturer_slug)
-        manufacturer_match = None
+    
+    def get_manufacturer_by_slug(self, manufacturer_slug):
+        """Finds the manufacturer matching the given slug."""
         for manufacturer in manufacturers:
             if slugify(manufacturer["name"]) == manufacturer_slug:
-                manufacturer_match = manufacturer
-                
+                return manufacturer
+        return None
+
+    def get(self, request, manufacturer_slug):
+        print("get", manufacturer_slug)
+        manufacturer_match = self.get_manufacturer_by_slug(manufacturer_slug)
+        
         if manufacturer_match:
             return JsonResponse(manufacturer_match)
         raise Http404()
     
-    def post(self, request, *args, **kwargs):
-        DUMMY_DATA_PATH = os.path.join(os.path.dirname(__file__), 'dummy_data.py')
+    def load_request_data(self, request):
+        """Loads the request data as a JSON object."""
+        try:
+            return json.loads(request.body)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON data: {str(e)}")
     
+    def create_new_manufacturer(self, data):
+        """Creates a new manufacturer object."""
+        return {
+            "name": data.get("name"),
+            "headquarters": data.get("headquarters"),
+            "founded": data.get("founded"),
+            "website": data.get("website"),
+            "description": data.get("description")
+        }
+
+    def update_dummy_data(self, new_manufacturer):
+        """Updates the dummy data file with the new manufacturer."""
+        DUMMY_DATA_PATH = os.path.join(os.path.dirname(__file__), 'dummy_data.py')
+        
+        manufacturers.append(new_manufacturer)
+        
+        with open(DUMMY_DATA_PATH, 'r') as file:
+            lines = file.readlines()
+
+        start_index = None
+        end_index = None
+
+        for i, line in enumerate(lines):
+            if line.strip().startswith('manufacturers ='):
+                start_index = i
+            elif start_index is not None and line.strip().startswith(']'):
+                end_index = i
+                break
+
+        if start_index is not None and end_index is not None:
+            updated_data = f"manufacturers = {json.dumps(manufacturers, indent=4)}\n"
+            lines = lines[:start_index] + [updated_data] + lines[end_index + 1:]
+            with open(DUMMY_DATA_PATH, 'w') as file:
+                file.writelines(lines)
+
+    def post(self, request, *args, **kwargs):
         if request.method == "POST":
             try:
-                data = json.loads(request.body)
-                new_manufacturer = {
-                    "name": data.get("name"),
-                    "headquarters": data.get("headquarters"),
-                    "founded": data.get("founded"),
-                    "website": data.get("website"),
-                    "description": data.get("description")
-                }
-
-                manufacturers.append(new_manufacturer)
-                with open(DUMMY_DATA_PATH, 'r') as file:
-                    lines = file.readlines()
-                    
-                start_index = None
-                end_index = None
-
-                for i, line in enumerate(lines):
-                    if line.strip().startswith('manufacturers ='):
-                        start_index = i
-                    elif start_index is not None and line.strip().startswith(']'):
-                        end_index = i
-                        break
-
-                if start_index is not None and end_index is not None:
-                    updated_data = f"manufacturers = {json.dumps(manufacturers, indent=4)}\n"
-                    lines = lines[:start_index] + [updated_data] + lines[end_index + 1:]
-                    with open(DUMMY_DATA_PATH, 'w') as file:
-                        file.writelines(lines)
-
+                data = self.load_request_data(request)
+                new_manufacturer = self.create_new_manufacturer(data)
+                self.update_dummy_data(new_manufacturer)
+                
                 return JsonResponse({"status": "success", "message": "Manufacturer added"})
-
-            except Exception as e:
+            except ValueError as e:
                 return JsonResponse({"error": str(e)}, status=400)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)
+
 
 def single_gadget_view(request, gadget_slug=""):
     
